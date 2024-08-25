@@ -1,7 +1,7 @@
 ![alt text](https://github.com/JaredHane98/AWS-CDK-GO-IMAGE-TRANSFORM/blob/main/Diagram.png?raw=true)
 
 
-When making a Post request for a URL the user must provide the transforms in a JSON format EG:
+The user must provide the image transforms during the POST request
 
 ## Example
 ```json
@@ -30,6 +30,9 @@ When making a Post request for a URL the user must provide the transforms in a J
 -   sepia
 -   sharpen
 -   sobel
+
+
+Beware you can very easily max out memory usage of image transform and timeout the lambda. 
 
 
 
