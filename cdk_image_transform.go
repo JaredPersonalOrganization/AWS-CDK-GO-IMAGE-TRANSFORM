@@ -61,14 +61,6 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
 	})
 
-	awscdk.NewCfnOutput(stack, jsii.String("InputBucket"), &awscdk.CfnOutputProps{
-		Value: inputBucket.BucketName(),
-	})
-
-	awscdk.NewCfnOutput(stack, jsii.String("OuputBucket"), &awscdk.CfnOutputProps{
-		Value: outputBucket.BucketName(),
-	})
-
 	bundlingOptions := &awslambdago.BundlingOptions{
 		GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)}, // -s: Strip symbols, -w: Strip debug info
 	}
@@ -85,7 +77,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 	})
 
 	// generate url lambda
-	generate_url_lambda := awslambdago.NewGoFunction(stack, jsii.String("GenerateUrlLambda"), &awslambdago.GoFunctionProps{
+	generateUrlLambda := awslambdago.NewGoFunction(stack, jsii.String("GenerateUrlLambda"), &awslambdago.GoFunctionProps{
 		Architecture: lambda.Architecture_X86_64(),
 		Runtime:      lambda.Runtime_PROVIDED_AL2(),
 		Bundling:     bundlingOptions,
@@ -98,7 +90,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 		},
 	})
 
-	generate_url_lambda.AddToRolePolicy(iam.NewPolicyStatement(&iam.PolicyStatementProps{
+	generateUrlLambda.AddToRolePolicy(iam.NewPolicyStatement(&iam.PolicyStatementProps{
 		Actions: &[]*string{
 			jsii.String("s3:PutObject"),
 		},
@@ -107,7 +99,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 		},
 	}))
 
-	authTable.GrantWriteData(generate_url_lambda)
+	authTable.GrantWriteData(generateUrlLambda)
 
 	// create image transform lambda
 	transformImageLambda := awslambdago.NewGoFunction(stack, jsii.String("TransformImageLambda"), &awslambdago.GoFunctionProps{
@@ -137,7 +129,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 
 	authTable.GrantReadWriteData(transformImageLambda)
 
-	access_object_lambda := awslambdago.NewGoFunction(stack, jsii.String("AccessObjectLambda"), &awslambdago.GoFunctionProps{
+	accessObjectLambda := awslambdago.NewGoFunction(stack, jsii.String("AccessObjectLambda"), &awslambdago.GoFunctionProps{
 		Architecture: lambda.Architecture_X86_64(),
 		Runtime:      lambda.Runtime_PROVIDED_AL2(),
 		Bundling:     bundlingOptions,
@@ -150,7 +142,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 		},
 	})
 
-	access_object_lambda.AddToRolePolicy(iam.NewPolicyStatement(&iam.PolicyStatementProps{
+	accessObjectLambda.AddToRolePolicy(iam.NewPolicyStatement(&iam.PolicyStatementProps{
 		Actions: &[]*string{
 			jsii.String("s3:GetObject"),
 		},
@@ -159,7 +151,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 		},
 	}))
 
-	authTable.GrantReadData(access_object_lambda)
+	authTable.GrantReadData(accessObjectLambda)
 
 	dlqLambda := awslambdago.NewGoFunction(stack, jsii.String("DLQLambda"), &awslambdago.GoFunctionProps{
 		Architecture: lambda.Architecture_X86_64(),
@@ -251,31 +243,23 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 		ResponseModels: &map[string]awsapigateway.IModel{"application/json": awsapigateway.Model_EMPTY_MODEL()},
 	}
 
-	generate_url_integration := awsapigateway.NewLambdaIntegration(generate_url_lambda, nil)
+	generateUrlIntegration := awsapigateway.NewLambdaIntegration(generateUrlLambda, nil)
 
-	generate_url_resouce := api.Root().AddResource(jsii.String("generate-url"), nil)
-	postmethod := generate_url_resouce.AddMethod(jsii.String("POST"), generate_url_integration, &awsapigateway.MethodOptions{
+	generateUrlResource := api.Root().AddResource(jsii.String("generate-url"), nil)
+	postmethod := generateUrlResource.AddMethod(jsii.String("POST"), generateUrlIntegration, &awsapigateway.MethodOptions{
 		AuthorizationType: awsapigateway.AuthorizationType_NONE,
 	})
 	postmethod.AddMethodResponse(&response)
 
-	access_object_integration := awsapigateway.NewLambdaIntegration(access_object_lambda, nil)
+	accessObjectIntegration := awsapigateway.NewLambdaIntegration(accessObjectLambda, nil)
 
-	access_object_resource := api.Root().AddResource(jsii.String("access-object"), nil)
-	getmethod := access_object_resource.AddMethod(jsii.String("GET"), access_object_integration, &awsapigateway.MethodOptions{
+	accessObjectResource := api.Root().AddResource(jsii.String("access-object"), nil)
+	getmethod := accessObjectResource.AddMethod(jsii.String("GET"), accessObjectIntegration, &awsapigateway.MethodOptions{
 		AuthorizationType: awsapigateway.AuthorizationType_CUSTOM,
 		Authorizer:        auth,
 	})
 	getmethod.AddMethodResponse(&response)
-
-	awscdk.NewCfnOutput(stack, jsii.String("generate_url_lambda"), &awscdk.CfnOutputProps{
-		Value: generate_url_lambda.FunctionName(),
-	})
-
-	// getmethod.AddMethodResponse(&awsapigateway.MethodResponse{
-	// 	StatusCode: jsii.String("200"),
-	// })
-
+	
 	return stack
 }
 
