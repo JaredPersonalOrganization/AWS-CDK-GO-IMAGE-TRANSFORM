@@ -77,7 +77,7 @@ func NewCdkImageTransformStack(scope constructs.Construct, id string, props *Cdk
 
 	// create the SQS queue
 	uploadQueue := awssqs.NewQueue(stack, jsii.String("BucketUploadQueue"), &awssqs.QueueProps{
-		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(30)),
+		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
 		DeadLetterQueue: &awssqs.DeadLetterQueue{
 			MaxReceiveCount: jsii.Number(1),
 			Queue:           dlq,
