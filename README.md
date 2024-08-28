@@ -84,7 +84,7 @@ The user must provide the image transforms during the POST request
 ## Output Image
 ![alt text](https://github.com/JaredHane98/AWS-CDK-GO-IMAGE-TRANSFORM/blob/main/outputimage.jpg?raw=true)
 
-Beaware you can max out memory usage with high resolutions and potentially time out the lambda.
+Be aware that you can max out memory usage with high resolutions, potentially causing the Lambda function to time out.
 
 
 
