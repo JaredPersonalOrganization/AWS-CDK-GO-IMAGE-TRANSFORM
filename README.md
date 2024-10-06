@@ -1,6 +1,6 @@
-![alt text](https://github.com/JaredHane98/AWS-CDK-GO-IMAGE-TRANSFORM/blob/main/Diagram.png?raw=true)
-
 After looking back on this project after a couple of months, it's extremely inefficent and overly complicated. But the code is decent.
+
+![alt text](https://github.com/JaredHane98/AWS-CDK-GO-IMAGE-TRANSFORM/blob/main/Diagram.png?raw=true)
 
 The user must provide the image transforms during the POST request
 
