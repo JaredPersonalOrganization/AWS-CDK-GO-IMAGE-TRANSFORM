@@ -1,4 +1,4 @@
-After looking back on this project after a couple of months, it's extremely inefficent and overly complicated. But the code is decent.
+After looking back on this project after a couple of months, it's extremely inefficent and overly complicated. But the code can still be used as a reference.
 
 ![alt text](https://github.com/JaredHane98/AWS-CDK-GO-IMAGE-TRANSFORM/blob/main/Diagram.png?raw=true)
 
